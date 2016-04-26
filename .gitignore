@@ -1,0 +1,10 @@
+# Ignore these auto-generated files:
+*.pyc
+*.pyo
+*~
+dist
+build
+zips
+irt_parameter_estimation.egg-info
+MANIFEST
+private
