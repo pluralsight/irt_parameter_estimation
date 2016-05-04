@@ -58,7 +58,6 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
-# Some basic broadcasting stuff has changed, but this should be mostly the same as quiz_site:
 from util import (ConvergenceError, dev_zeta_lam, dev_ab, logistic, scale_guessing,
                   logistic3PLabc as logistic3PL,
                   chi_squared as chiSquared)
