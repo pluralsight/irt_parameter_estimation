@@ -84,6 +84,7 @@ def J_1PL(theta, r, f, P, a, b, c=0, Pstar=None):
     a here is an ARRAY, not a scalar
     """
 
+    a = a * np.ones(P.shape) # force a to be an array
     theta, r, f = expand_dims(P, theta, r, f)
     rmfP = r - f * P
     Prat = 1 if Pstar is None else Pstar / P
@@ -111,6 +112,7 @@ def J_2PL(theta, r, f, P, a, b, c=0, Pstar=None):
     a here is an ARRAY, not a scalar
     """
 
+    a = a * np.ones(P.shape) # force a to be an array
     theta, r, f = expand_dims(P, theta, r, f)
     rmfP = r - f * P
     Prat = 1 if Pstar is None else Pstar / P
@@ -142,6 +144,7 @@ def J_3PL(theta, r, f, P, a, b, c, Pstar):
     a here is an ARRAY, not a scalar
     """
 
+    a = a * np.ones(P.shape) # force a to be an array
     theta, r, f = expand_dims(P, theta, r, f)
     rmfP = r - f * P
     iPc = 1 / (P - c)
