@@ -15,11 +15,9 @@ In addition, fitting using the zeta/lamdba/c formulation is also implemented.
 The difference here boils down to the logistic exponent.
 The conversion is:
 
+a (θ<sub>j</sub> - b) = ζ + λ θ<sub>j</sub>
+
 ```a * (theta_j - b) = zeta + lambda * theta_j```
-
-in TeX:
-
-```a (\theta _j-b)=\zeta +\lambda \theta _j```
 
 This seemingly insignificant change has drastic effects on the convergence
 properties (especially in the 2PL case, but also the 3PL case).
@@ -34,7 +32,8 @@ http://www.crcpress.com/product/isbn/9780824758257
 The exception is the 3 parameter zeta/lambda/c implementation which to our
 knowledge has not been derived or documented before.
 For this reason, we include the mathematical derivations here:
-(see A TEX OR PDF FILE AND/OR LINK WITH THE MATH AND STUFF)
+
+[irt-zlc-formuation.pdf](doc/zlc-irt-formulation.pdf)
 
 The original BASIC code that work was derived from can be downloaded here:
 
@@ -62,11 +61,3 @@ a side-by-side difference tool
 to compare abc_mle.py with zlc.mle.py.
 
 All common utilities are found in util.py.
-
-# http://haixing-hu.github.io/programming/2013/09/20/how-to-use-mathjax-in-jekyll-generated-github-pages/
-
-# KaTeX generation:
-
-cat in.tex | katex --disply-mode > out.html
-echo '<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.5.1/katex.min.css">'|cat - out.html > /tmp/out && mv /tmp/out yourfile
-
