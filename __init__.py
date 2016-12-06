@@ -12,5 +12,8 @@ __path__[-1] = os.path.join(__path__[-1],__name__)
 TEMP_INIT_FILE = os.path.join(__path__[-1],'__init__.py')
 del os
 
-execfile(TEMP_INIT_FILE)
-del TEMP_INIT_FILE
+with open(TEMP_INIT_FILE) as TEMP_HANDLE:
+    TEMP_CODE = compile(TEMP_HANDLE.read(), TEMP_INIT_FILE, 'exec')
+    exec(TEMP_CODE)
+
+del TEMP_HANDLE, TEMP_CODE, TEMP_INIT_FILE
