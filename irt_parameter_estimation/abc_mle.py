@@ -67,9 +67,9 @@ from __future__ import division
 import numpy as np
 from scipy.optimize import root #, minimize
 
-from util import (ConvergenceError, dev_ab, logistic,
-                  scale_guessing, logistic3PLabc, chi_squared, reduced_chi_squared,
-                  expand_dims, pack_abc, unpack_abc, get_L_abc)
+from .util import (ConvergenceError, dev_ab, logistic,
+                   scale_guessing, logistic3PLabc, chi_squared, reduced_chi_squared,
+                   expand_dims, pack_abc, unpack_abc, get_L_abc)
 
 ########################################################################
 ## Functions to compute 1st and 2nd derivatives of the likelihood
@@ -215,7 +215,7 @@ def mle_abc(num_params, theta, r, f, a, b, c, use_2nd=False,
     history of abc values.
     """
 
-    theta, r, f = map(np.asanyarray, [theta, r, f]) # ensure these are arrays
+    theta, r, f = list(map(np.asanyarray, [theta, r, f])) # ensure these are arrays
 
     count = [0]
 
@@ -260,7 +260,7 @@ def mle_abc(num_params, theta, r, f, a, b, c, use_2nd=False,
         raise ConvergenceError('scipy.optimize.root failed to converge')
 
     a, b, c = unpack_abc(a, b, c, results.x)
-    print count[0], 'iterations in root'
+    print(count[0], 'iterations in root')
 
     P = logistic3PLabc(a, b, c, theta)
     chi2 = chi_squared(r, f, P)

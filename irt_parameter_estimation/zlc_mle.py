@@ -70,9 +70,9 @@ from __future__ import division
 import numpy as np
 from scipy.optimize import root #, minimize
 
-from util import (ConvergenceError, dev_zeta_lam, logistic,
-                  scale_guessing, logistic3PLzlc, chi_squared, reduced_chi_squared,
-                  expand_dims, pack_zlc, unpack_zlc, get_L_zlc)
+from .util import (ConvergenceError, dev_zeta_lam, logistic,
+                   scale_guessing, logistic3PLzlc, chi_squared, reduced_chi_squared,
+                   expand_dims, pack_zlc, unpack_zlc, get_L_zlc)
 
 ########################################################################
 ## Functions to compute 1st and 2nd derivatives of the likelihood
@@ -210,7 +210,7 @@ def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
     history of zlc values.
     """
 
-    theta, r, f = map(np.asanyarray, [theta, r, f]) # ensure these are arrays
+    theta, r, f = list(map(np.asanyarray, [theta, r, f])) # ensure these are arrays
 
     count = [0]
 
@@ -255,7 +255,7 @@ def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
         raise ConvergenceError('scipy.optimize.root failed to converge')
 
     zeta, lam, c = unpack_zlc(zeta, lam, c, results.x)
-    print count[0], 'iterations in root'
+    print(count[0], 'iterations in root')
 
     P = logistic3PLzlc(zeta, lam, c, theta)
     chi2 = chi_squared(r, f, P)

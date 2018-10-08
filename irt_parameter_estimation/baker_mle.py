@@ -58,9 +58,9 @@ from __future__ import division
 import numpy as np
 import matplotlib.pyplot as plt
 
-from util import (ConvergenceError, dev_zeta_lam, dev_ab, logistic, scale_guessing,
-                  logistic3PLabc as logistic3PL,
-                  chi_squared as chiSquared)
+from .util import (ConvergenceError, dev_zeta_lam, dev_ab, logistic, scale_guessing,
+                   logistic3PLabc as logistic3PL,
+                   chi_squared as chiSquared)
 
 #MAX_ITERATIONS = 10000
 W_CUTOFF = 0.0000009
@@ -74,11 +74,11 @@ def mle_1_parameter(theta, r, f, a, b, MAX_ITERATIONS=10000):
        From "Item Response Theory: Parameter Estimation Techniques"
        Chapter 2.3, pages 40-45 (esp Eqn 2.20) and
        Appendix A, pages 289-297 (port of A.3 on p.294)'''
-    theta, r, f = map(np.asanyarray, [theta, r, f]) # ensure these are arrays
+    theta, r, f = list(map(np.asanyarray, [theta, r, f])) # ensure these are arrays
     p = r / f
 
     for i in range(MAX_ITERATIONS):
-        print "iteration", i
+        print("iteration", i)
         P = np.squeeze(logistic(dev_ab(a, b, theta)))
         W = P * (1 - P)
         W[np.where(W<W_CUTOFF)] = np.nan # Delete any dud values
@@ -86,7 +86,7 @@ def mle_1_parameter(theta, r, f, a, b, MAX_ITERATIONS=10000):
         dLdb = np.nansum(r - f * P)
         d2Ldb2 = -np.nansum(f * W)
 
-        print 'dLdb', dLdb, 'd2L / db2', d2Ldb2
+        print('dLdb', dLdb, 'd2L / db2', d2Ldb2)
 
         # Plot the Log Likelihood & 1st&2nd derivatives
         '''
@@ -112,7 +112,7 @@ def mle_1_parameter(theta, r, f, a, b, MAX_ITERATIONS=10000):
 
         b += Db
 
-        print 'b', b, 'Db', Db
+        print('b', b, 'Db', Db)
 
         if abs(b)>MAX_ZETA:
             raise ConvergenceError("OUT OF BOUNDS ERROR ITERATION %i" % i)
@@ -121,7 +121,7 @@ def mle_1_parameter(theta, r, f, a, b, MAX_ITERATIONS=10000):
             break
 
     if i == MAX_ITERATIONS:
-        print "REACHED MAXIMUM NUMBER OF ITERATIONS"
+        print("REACHED MAXIMUM NUMBER OF ITERATIONS")
 
     P = logistic(dev_ab(a, b, theta))
     chi2 = chiSquared(f, p, P)
@@ -132,11 +132,11 @@ def mle_2_parameter(theta, r, f, zeta, lam, MAX_ITERATIONS=10000):
        From "Item Response Theory: Parameter Estimation Techniques"
        Chapter 2.3, pages 40-45 (esp Eqn 2.20) and
        Appendix A, pages 289-297 (port of A.3 on p.294)'''
-    theta, r, f = map(np.asanyarray, [theta, r, f]) # ensure these are arrays
+    theta, r, f = list(map(np.asanyarray, [theta, r, f])) # ensure these are arrays
     p = r / f
 
     for i in range(MAX_ITERATIONS):
-        print "iteration", i
+        print("iteration", i)
         P = np.squeeze(logistic(dev_zeta_lam(zeta, lam, theta)))
         W = P * (1 - P)
         W[np.where(W<W_CUTOFF)] = np.nan # Delete any dud values
@@ -171,7 +171,7 @@ def mle_2_parameter(theta, r, f, zeta, lam, MAX_ITERATIONS=10000):
             break
 
     if i == MAX_ITERATIONS:
-        print "REACHED MAXIMUM NUMBER OF ITERATIONS"
+        print("REACHED MAXIMUM NUMBER OF ITERATIONS")
 
     #chi2 = np.nansum(fWV2) # sum of f[i] * W[i] * v[i]^2
     P = logistic(dev_zeta_lam(zeta, lam, theta))
@@ -197,11 +197,11 @@ def mle_3_parameter(theta, r, f, a, b, c, MAX_ITERATIONS=10000):
        Q = 1 - P = 1 - c - (1 - c) * Pstar
        So, 1 - c - (1 - c) * Pstar = (1 - c) * Qstar
        Qstar = ((1 - c) - (1 - c) * Pstar) / (1 - c) = 1 - Pstar'''
-    theta, r, f = map(np.asanyarray, [theta, r, f]) # ensure these are arrays
+    theta, r, f = list(map(np.asanyarray, [theta, r, f])) # ensure these are arrays
     p = r / f
 
     for i in range(MAX_ITERATIONS):
-        print "iteration", i
+        print("iteration", i)
         aa = a * np.ones(f.shape) # array version of a
         Pstar = logistic(dev_ab(a, b, theta))
         P = np.squeeze(scale_guessing(Pstar, c))
@@ -252,7 +252,7 @@ def mle_3_parameter(theta, r, f, a, b, c, MAX_ITERATIONS=10000):
             break
 
     if i == MAX_ITERATIONS:
-        print "REACHED MAXIMUM NUMBER OF ITERATIONS"
+        print("REACHED MAXIMUM NUMBER OF ITERATIONS")
 
     P = logistic3PL(a, b, c, theta)
     chi2 = chiSquared(f, p, P)
