@@ -56,7 +56,7 @@ This version is for comparative purposes only, use zlc_mle.py instead.
 
 from __future__ import division
 import numpy as np
-import matplotlib.pyplot as plt
+#import matplotlib.pyplot as plt
 
 from .util import (ConvergenceError, dev_zeta_lam, dev_ab, logistic, scale_guessing,
                    logistic3PLabc as logistic3PL,

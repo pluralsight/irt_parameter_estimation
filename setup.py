@@ -1,4 +1,4 @@
-from distutils.core import setup
+from setuptools import setup
 
 # Read the version number
 with open("irt_parameter_estimation/_version.py") as f:
@@ -15,6 +15,7 @@ setup(
     license='LICENSE.txt',
     description='Parameter estimation routines for logistic Item Characteristic Curves (ICC) from Item Response Theory (IRT)',
     long_description=open('README.md').read(),
+    long_description_content_type="text/markdown",
     install_requires=['numpy>=1.0',
                       'scipy>=0.8'
                      ],
