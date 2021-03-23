@@ -8,12 +8,13 @@
 # in the __name__ directory below this one...
 
 import os
-__path__[-1] = os.path.join(__path__[-1],__name__)
-TEMP_INIT_FILE = os.path.join(__path__[-1],'__init__.py')
+
+__path__[-1] = os.path.join(__path__[-1], __name__)
+TEMP_INIT_FILE = os.path.join(__path__[-1], "__init__.py")
 del os
 
 with open(TEMP_INIT_FILE) as TEMP_HANDLE:
-    TEMP_CODE = compile(TEMP_HANDLE.read(), TEMP_INIT_FILE, 'exec')
+    TEMP_CODE = compile(TEMP_HANDLE.read(), TEMP_INIT_FILE, "exec")
     exec(TEMP_CODE)
 
 del TEMP_HANDLE, TEMP_CODE, TEMP_INIT_FILE

@@ -424,4 +424,3 @@ def mle_3_parameter(
         return_history=return_history,
         verbose=verbose,
     )
-
