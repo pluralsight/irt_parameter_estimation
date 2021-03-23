@@ -14,7 +14,7 @@
 #  See the License for the specific language governing permissions and
 #  limitations under the License.
 
-'''Implementations of various Maximum Likelihood Estimation methods
+"""Implementations of various Maximum Likelihood Estimation methods
 
 The various methods below fit a logistic functions to the binned
 response percentiles for each questions.
@@ -64,21 +64,32 @@ baker_mle.py implements the 2PL model directly from Baker
 (has 1-1 matching with published values)
 
 If you know nothing, use this and ignore the other two :)
-'''
+"""
 
 from __future__ import division
 import numpy as np
-from scipy.optimize import root #, minimize
+from scipy.optimize import root  # , minimize
 
-from .util import (ConvergenceError, dev_zeta_lam, logistic,
-                   scale_guessing, logistic3PLzlc, chi_squared, reduced_chi_squared,
-                   expand_dims, pack_zlc, unpack_zlc, get_L_zlc)
+from .util import (
+    ConvergenceError,
+    dev_zeta_lam,
+    logistic,
+    scale_guessing,
+    logistic3PLzlc,
+    chi_squared,
+    reduced_chi_squared,
+    expand_dims,
+    pack_zlc,
+    unpack_zlc,
+    get_L_zlc,
+)
 
 ########################################################################
 ## Functions to compute 1st and 2nd derivatives of the likelihood
 ## for the 1, 2, & 3 parameter logistic models
 ## For consistency, all functions now use: np.nansum( [<>] , axis=1 or 2)
 ########################################################################
+
 
 def J_1PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     """Get the Jacobian of the log likelihood for the 1PL model
@@ -93,6 +104,7 @@ def J_1PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     L1 = Prat * rmfP
     return np.nansum([L1], axis=1)
 
+
 def H_1PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     """Get the Hessian Matrix of the log likelihood for the 1PL model
     (2nd derivative wrt zeta)
@@ -101,7 +113,7 @@ def H_1PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     theta, r, f = expand_dims(P, theta, r, f)
     Pstar = P if Pstar is None else Pstar
     W = Pstar * (1 - Pstar)
-    rP2 = r / P**2
+    rP2 = r / P ** 2
     rP2cmf = rP2 * c - f
     EL11 = rP2cmf * W
     return np.nansum([[EL11]], axis=2)
@@ -120,6 +132,7 @@ def J_2PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     L1, L2 = Prat * rmfP, Prat * rmfP * theta
     return np.nansum([L1, L2], axis=1)
 
+
 def H_2PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     """Get the Hessian Matrix of the log likelihood for the 2PL model
     (2nd derivative wrt zeta, lam)
@@ -128,13 +141,11 @@ def H_2PL(theta, r, f, P, zeta, lam, c=0, Pstar=None):
     theta, r, f = expand_dims(P, theta, r, f)
     Pstar = P if Pstar is None else Pstar
     W = Pstar * (1 - Pstar)
-    rP2 = r / P**2
+    rP2 = r / P ** 2
     rP2cmf = rP2 * c - f
-    EL11, EL22, EL12 = [rP2cmf * W,
-                        rP2cmf * W * theta**2,
-                        rP2cmf * W * theta]
-    return np.nansum([[EL11, EL12],
-                      [EL12, EL22]], axis=2)
+    EL11, EL22, EL12 = [rP2cmf * W, rP2cmf * W * theta ** 2, rP2cmf * W * theta]
+    return np.nansum([[EL11, EL12], [EL12, EL22]], axis=2)
+
 
 def J_3PL(theta, r, f, P, zeta, lam, c, Pstar):
     """Get the Jacobian of the log likelihood for the 3PL model
@@ -150,6 +161,7 @@ def J_3PL(theta, r, f, P, zeta, lam, c, Pstar):
     L1, L2, L3 = np.array([Prat, Prat * theta, iP1mc]) * rmfP
     return np.nansum([L1, L2, L3], axis=1)
 
+
 def H_3PL(theta, r, f, P, zeta, lam, c, Pstar):
     """Get the Hessian Matrix of the log likelihood for the 3PL model
     (2nd derivative wrt zeta, lam, c)
@@ -158,47 +170,61 @@ def H_3PL(theta, r, f, P, zeta, lam, c, Pstar):
     theta, r, f = expand_dims(P, theta, r, f)
     Pstar = P if Pstar is None else Pstar
     W = Pstar * (1 - Pstar)
-    rP2 = r / P**2
+    rP2 = r / P ** 2
     rP2cmf = rP2 * c - f
-    EL11, EL22, EL33 = [rP2cmf * W,
-                        rP2cmf * W * theta**2,
-                        (rP2 * (2 * P - 1) - f) / (1 - c)**2]
-    EL12, EL13, EL23 = [rP2cmf * W * theta,
-                        -rP2 * W,
-                        -rP2 * W * theta]
-    return np.nansum([[EL11, EL12, EL13],
-                      [EL12, EL22, EL23],
-                      [EL13, EL23, EL33]], axis=2)
+    EL11, EL22, EL33 = [
+        rP2cmf * W,
+        rP2cmf * W * theta ** 2,
+        (rP2 * (2 * P - 1) - f) / (1 - c) ** 2,
+    ]
+    EL12, EL13, EL23 = [rP2cmf * W * theta, -rP2 * W, -rP2 * W * theta]
+    return np.nansum(
+        [[EL11, EL12, EL13], [EL12, EL22, EL23], [EL13, EL23, EL33]], axis=2
+    )
+
 
 ########################################################################
 ## Compute optimal values for the fit parameters using
 ## maximum likelihood estimation in the 1PL, 2PL, and 3PL cases:
 ########################################################################
 
-JH = {1: (J_1PL, H_1PL),
-      2: (J_2PL, H_2PL),
-      3: (J_3PL, H_3PL)}
+JH = {1: (J_1PL, H_1PL), 2: (J_2PL, H_2PL), 3: (J_3PL, H_3PL)}
 
-def get_derivative_L(num_params, theta, r, f, zeta=None, lam=None, c=None,
-                     do2nd=False):
+
+def get_derivative_L(num_params, theta, r, f, zeta=None, lam=None, c=None, do2nd=False):
     DL = JH[num_params][do2nd]
+
     def derivative_L(zlc):
-        _zeta, _lam, _c = unpack_zlc(zeta, lam, c, zlc) # unpack the parameters
+        _zeta, _lam, _c = unpack_zlc(zeta, lam, c, zlc)  # unpack the parameters
         Pstar = logistic(dev_zeta_lam(_zeta, _lam, theta))
         P = scale_guessing(Pstar, _c)
         return DL(theta, r, f, P, _zeta, _lam, _c, Pstar)
+
     return derivative_L
 
+
 def get_JL(num_params, theta, r, f, zeta=None, lam=None, c=None):
-    return get_derivative_L(num_params, theta, r, f, zeta, lam, c,
-                            do2nd=False)
+    return get_derivative_L(num_params, theta, r, f, zeta, lam, c, do2nd=False)
+
 
 def get_HL(num_params, theta, r, f, zeta=None, lam=None, c=None):
-    return get_derivative_L(num_params, theta, r, f, zeta, lam, c,
-                            do2nd=True)
+    return get_derivative_L(num_params, theta, r, f, zeta, lam, c, do2nd=True)
 
-def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
-            force_convergence=True, method=None, return_history=False):
+
+def mle_zlc(
+    num_params,
+    theta,
+    r,
+    f,
+    zeta,
+    lam,
+    c,
+    use_2nd=False,
+    force_convergence=True,
+    method=None,
+    return_history=False,
+    verbose=True,
+):
     """Perform logistic ICC model parameter estimation using MLE
     Based on theoretical foundations for the 3PL model in
     "Item Response Theory: Parameter Estimation Techniques"
@@ -210,7 +236,7 @@ def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
     history of zlc values.
     """
 
-    theta, r, f = list(map(np.asanyarray, [theta, r, f])) # ensure these are arrays
+    theta, r, f = list(map(np.asanyarray, [theta, r, f]))  # ensure these are arrays
 
     count = [0]
 
@@ -224,6 +250,7 @@ def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
         zlc_hist = []
 
     ZETA, LAM, C = zeta, lam, c
+
     def JL(params):
         count[0] += 1
 
@@ -234,7 +261,7 @@ def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
         P = scale_guessing(Pstar, c)
 
         if c == 0 and num_params < 3:
-            Pstar = None # optimize :)
+            Pstar = None  # optimize :)
 
         JLL = J(theta, r, f, P, zeta, lam, c, Pstar)
 
@@ -248,57 +275,149 @@ def mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd=False,
 
         return JLL, HLL
 
-    kwds = (dict(jac=use_2nd) if method is None else
-            dict(jac=use_2nd, method=method))
+    kwds = dict(jac=use_2nd) if method is None else dict(jac=use_2nd, method=method)
     results = root(JL, pack_zlc(zeta, lam, c, num_params), **kwds)
     if force_convergence and not results.success:
-        raise ConvergenceError('scipy.optimize.root failed to converge')
+        raise ConvergenceError("scipy.optimize.root failed to converge")
 
     zeta, lam, c = unpack_zlc(zeta, lam, c, results.x)
-    print(count[0], 'iterations in root')
+    if verbose:
+        print(count[0], "iterations in root")
 
     P = logistic3PLzlc(zeta, lam, c, theta)
     chi2 = chi_squared(r, f, P)
-    return (zeta, lam, c, chi2, results.success) + ((zlc_hist,) if return_history else ())
+    return (zeta, lam, c, chi2, results.success) + (
+        (zlc_hist,) if return_history else ()
+    )
 
-def mle_abc(num_params, theta, r, f, a, b, c, use_2nd=False,
-            force_convergence=True, method=None, return_history=False):
+
+def mle_abc(
+    num_params,
+    theta,
+    r,
+    f,
+    a,
+    b,
+    c,
+    use_2nd=False,
+    force_convergence=True,
+    method=None,
+    return_history=False,
+    verbose=True,
+):
     """This version transforms (a, b, c) into (zeta, lambda, c) and back
     when performing the actual fits"""
     zeta, lam = -a * b, a
-    result = mle_zlc(num_params, theta, r, f, zeta, lam, c, use_2nd, force_convergence,
-                     method=method, return_history=return_history)
+    result = mle_zlc(
+        num_params,
+        theta,
+        r,
+        f,
+        zeta,
+        lam,
+        c,
+        use_2nd,
+        force_convergence,
+        method=method,
+        return_history=return_history,
+        verbose=verbose,
+    )
     zeta, lam = result[:2]
     a, b = lam, -zeta / lam
     return (a, b) + result[2:]
 
-mle_abc.__doc__ = '\n\n'.join([mle_zlc.__doc__, mle_abc.__doc__])
+
+mle_abc.__doc__ = "\n\n".join([mle_zlc.__doc__, mle_abc.__doc__])
 
 
-def mle_1_parameter(theta, r, f, a, b, c=0, use_2nd=False,
-                    force_convergence=True, return_history=False):
+def mle_1_parameter(
+    theta,
+    r,
+    f,
+    a,
+    b,
+    c=0,
+    use_2nd=False,
+    force_convergence=True,
+    return_history=False,
+    verbose=True,
+):
     """One parameter logistic ICC model parameter estimation using MLE
     From "Item Response Theory: Parameter Estimation Techniques"
     This is a 1PL model using a reformulation of Baker's 2PL math"""
-    return mle_abc(1, theta, r, f, a, b, c,
-                   use_2nd=use_2nd, force_convergence=force_convergence,
-                   return_history=return_history)
+    return mle_abc(
+        1,
+        theta,
+        r,
+        f,
+        a,
+        b,
+        c,
+        use_2nd=use_2nd,
+        force_convergence=force_convergence,
+        return_history=return_history,
+        verbose=verbose,
+    )
 
-def mle_2_parameter(theta, r, f, a, b, c=0, use_2nd=False,
-                    force_convergence=True, return_history=False):
+
+def mle_2_parameter(
+    theta,
+    r,
+    f,
+    a,
+    b,
+    c=0,
+    use_2nd=False,
+    force_convergence=True,
+    return_history=False,
+    verbose=True,
+):
     """Two parameter logistic ICC model parameter estimation using MLE
     From "Item Response Theory: Parameter Estimation Techniques"
     This uses a reformulation of Baker's 2PL math"""
-    return mle_abc(2, theta, r, f, a, b, c,
-                   use_2nd=use_2nd, force_convergence=force_convergence,
-                   return_history=return_history)
+    return mle_abc(
+        2,
+        theta,
+        r,
+        f,
+        a,
+        b,
+        c,
+        use_2nd=use_2nd,
+        force_convergence=force_convergence,
+        return_history=return_history,
+        verbose=verbose,
+    )
 
-def mle_3_parameter(theta, r, f, a, b, c, use_2nd=False,
-                    force_convergence=True, method='hybr', return_history=False):
+
+def mle_3_parameter(
+    theta,
+    r,
+    f,
+    a,
+    b,
+    c,
+    use_2nd=False,
+    force_convergence=True,
+    method="hybr",
+    return_history=False,
+    verbose=True,
+):
     """Three parameter logistic ICC model parameter estimation using MLE
     From "Item Response Theory: Parameter Estimation Techniques"
     This is a 3PL model using a reformulation of Baker's 2PL math"""
-    return mle_abc(3, theta, r, f, a, b, c,
-                   use_2nd=use_2nd, force_convergence=force_convergence,
-                   method=method, return_history=return_history)
+    return mle_abc(
+        3,
+        theta,
+        r,
+        f,
+        a,
+        b,
+        c,
+        use_2nd=use_2nd,
+        force_convergence=force_convergence,
+        method=method,
+        return_history=return_history,
+        verbose=verbose,
+    )
 
