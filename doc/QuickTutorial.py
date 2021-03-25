@@ -6,7 +6,7 @@
 # Here, we show a quick sample usage of the MLE routines in irt_parameter_estimation.
 # 
 # First of all, here is a sample item characteristic curve (ICC), a logistic function given item paramters:
-#  * a=15 (discimination)
+#  * a=10 (discimination)
 #  * b=0.6 (difficulty)
 #  * c=0.25 (guessing parameter)
 # 
@@ -86,6 +86,8 @@ _ = plt.title("Histogram of correct and incorect responses")
 # Next, we create the binned data more efficiently using numpy.
 # 
 # The MLE routines need the correct responses and total responses binned by ability (*r* and *f* in Baker's terminology).
+# 
+# There are fewer total responses (f) on the extreme ends because there are fewer total users at those levels of ability.
 
 # In[4]:
 
@@ -116,11 +118,11 @@ _ = plt.title("Ratio of correct responses by ability level")
 # 
 # First, we do the 2 parameter fits.
 # 
-# We can user either the zlc or abc module to do the fits. abc will do the fits directly and zlc will do the conversion under the hood.
+# We can user either the zlc or abc module to do the fits. abc will do the fits directly and zlc will do the conversion under the hood (see [the pdf](https://github.com/pluralsight/irt_parameter_estimation/blob/master/doc/zlc-irt-formulation.pdf) to understand the differences).
 # 
 # Here we show that we can reconstruct the original parameters pretty closely, but the 2PL does not fit the guessing parameter so it will predict the question is easier and less discriminating than than it really is.
 # 
-# Both methods come up with roughly a=6 (vs 15) and  b=0.585 (instead of 0.6).
+# Both methods come up with roughly a=6 (instead of 10) and  b=0.585 (instead of 0.6).
 
 # In[6]:
 

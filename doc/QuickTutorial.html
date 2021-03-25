@@ -13091,7 +13091,7 @@ div#notebook {
 <p>Here, we show a quick sample usage of the MLE routines in irt_parameter_estimation.</p>
 <p>First of all, here is a sample item characteristic curve (ICC), a logistic function given item paramters:</p>
 <ul>
-<li>a=15 (discimination)</li>
+<li>a=10 (discimination)</li>
 <li>b=0.6 (difficulty)</li>
 <li>c=0.25 (guessing parameter)</li>
 </ul>
@@ -13273,6 +13273,7 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Next, we create the binned data more efficiently using numpy.</p>
 <p>The MLE routines need the correct responses and total responses binned by ability (<em>r</em> and <em>f</em> in Baker's terminology).</p>
+<p>There are fewer total responses (f) on the extreme ends because there are fewer total users at those levels of ability</p>
 
 </div>
 </div>
@@ -13371,9 +13372,9 @@ div#notebook {
 <div class="text_cell_render border-box-sizing rendered_html">
 <p>Now we are ready to do the maximum likelihood estimation (MLE) to reconstruct the item parameters (in this case a, b, and c).</p>
 <p>First, we do the 2 parameter fits.</p>
-<p>We can user either the zlc or abc module to do the fits. abc will do the fits directly and zlc will do the conversion under the hood.</p>
+<p>We can user either the zlc or abc module to do the fits. abc will do the fits directly and zlc will do the conversion under the hood (see <a href="https://github.com/pluralsight/irt_parameter_estimation/blob/master/doc/zlc-irt-formulation.pdf">the pdf</a> to understand the differences).</p>
 <p>Here we show that we can reconstruct the original parameters pretty closely, but the 2PL does not fit the guessing parameter so it will predict the question is easier and less discriminating than than it really is.</p>
-<p>Both methods come up with roughly a=6 (vs 15) and  b=0.585 (instead of 0.6).</p>
+<p>Both methods come up with roughly a=6 (instead of 10) and  b=0.585 (instead of 0.6).</p>
 
 </div>
 </div>
