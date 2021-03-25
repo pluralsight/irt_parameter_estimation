@@ -8,3 +8,4 @@ zips
 irt_parameter_estimation.egg-info
 MANIFEST
 private
+.ipynb_checkpoints

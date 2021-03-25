@@ -61,3 +61,9 @@ a side-by-side difference tool
 to compare abc_mle.py with zlc.mle.py.
 
 All common utilities are found in util.py.
+
+## Tutorial
+
+*Updated 2021*
+
+To see a sample usage, check out the [QuickTutorial notebook](https://github.com/pluralsight/irt_parameter_estimation/blob/master/doc/QuickTutorial.ipynb)
